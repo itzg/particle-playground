@@ -1,0 +1,19 @@
+<div class="row" ng-controller="LoginController">
+    <div class="col-md-4">
+        <form ng-submit="login()">
+            <div class="form-group">
+                <label for="particleUsername">Particle Username</label>
+                <input type="email" ng-model="credentials.username" class="form-control" id="particleUsername"
+                       placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+                <label for="particlePassword">Password</label>
+                <input type="password" ng-model="credentials.password" class="form-control"
+                       id="particlePassword" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-default">Login</button>
+        </form>
+
+    </div>
+</div>
+

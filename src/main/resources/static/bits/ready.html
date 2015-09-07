@@ -1,0 +1,46 @@
+<div class="row" ng-controller="InteractController">
+    <div class="col-md-12">
+
+        <div ng-show="devices">
+            <h2>Devices</h2>
+            <table class="table">
+                <thead>
+                <th></th>
+                <th>Name</th>
+                <th>Connected?</th>
+                <th>Last Heard</th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="device in devices" ng-class="{active:device.active}">
+                    <td><input type="checkbox" ng-model="device.active"
+                               ng-change="handleActiveDeviceChange()"/></td>
+                    <td>{{device.name}}</td>
+                    <td>{{device.connected}}</td>
+                    <td>{{device.lastHeard | amCalendar}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <button class="btn btn-default" ng-click="loadDevices()">Reload Devices</button>
+        </div>
+
+        <div ng-show="activeDevices.length == 1">
+            <h3>Functions</h3>
+            <div ng-repeat="func in activeDevices[0].functions">
+                {{func}}
+            </div>
+            <form class="form-inline" name="functionCall" ng-submit="callFunction(activeDevices[0])">
+                <div class="form-group">
+                    <input type="text" class="form-control"
+                           placeholder="Function Name" name="name" ng-model="deviceFunction.name">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control"
+                           placeholder="Argument" name="arg" ng-model="deviceFunction.arg">
+                </div>
+                <button type="submit" class="btn btn-default">Call</button>
+            </form>
+        </div>
+    </div>
+</div>
