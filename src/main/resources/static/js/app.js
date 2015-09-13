@@ -1,6 +1,6 @@
 (function(){
-    angular.module('particle', ['angularMoment', 'ngCookies'])
-        .controller('AppController', function ($scope) {
+    angular.module('particle', ['angularMoment', 'ngCookies', 'ui.bootstrap'])
+        .controller('AppController', function ($scope, $cookies, cookieParticleAccessToken) {
             $scope.loggedIn = false;
             $scope.mode = 'login';
             $scope.particleLoginResponse = null;
@@ -16,6 +16,12 @@
                 $scope.loggedIn = true;
             };
 
+            $scope.logout = function() {
+                $scope.mode = 'login';
+                $scope.loggedIn = false;
+                $cookies.remove(cookieParticleAccessToken);
+                $scope.$emit('loggedOut');
+            }
 
         })
 
@@ -73,16 +79,25 @@
                 loginWithToken(existingToken);
             }
         })
-        .controller('InteractController', function($scope){
+        .controller('InteractController', function($scope, products){
             $scope.loadDevices = function() {
                 spark.listDevices()
                     .then(
                     function(devices){
                         $scope.$apply(function() {
+                            console.log("Loaded devices", devices);
                             $scope.devices = devices;
                         })
                     },
                     function(err){});
+            };
+
+            $scope.getActiveDeviceId = function () {
+                return $scope.activeDevices.length == 1 ? $scope.activeDevices[0].id : false;
+            };
+
+            $scope.getProductInfo = function(device) {
+                return products[device.productId];
             };
 
             $scope.handleActiveDeviceChange = function(evt) {
@@ -107,8 +122,67 @@
                 });
             };
 
+            $scope.$on('loggedOut', function () {
+                $scope.devices = [];
+                $scope.activeDevices = [];
+            });
+
             $scope.loadDevices();
         })
+
+        .controller('SubscribeEventsController', function($scope){
+
+            $scope.deviceScope = 'mine'; // or 'all' or 'selected'
+            $scope.prefix = '';
+
+            $scope.eventLimit = 10;
+            $scope.events = [];
+            $scope.reqObj = null;
+
+            $scope.subscribe = function() {
+                var eventPrefix = $scope.prefix.length > 0 ? $scope.prefix : false;
+                var device = false;
+
+                switch ($scope.deviceScope) {
+                    case 'mine':
+                        device = 'mine';
+                        break;
+                    case 'selected':
+                        device = $scope.getActiveDeviceId();
+                        break;
+                }
+
+                $scope.reqObj = spark.getEventStream(eventPrefix, device, function (data) {
+                    $scope.$apply(function () {
+                        $scope.events.unshift(data);
+                        while ($scope.events.length > $scope.eventLimit) {
+                            $scope.events.pop();
+                        }
+                    });
+                });
+            };
+
+            $scope.unsubscribe = function() {
+                $scope.reqObj.abort();
+                $scope.reqObj = null;
+            }
+
+            $scope.isSubscribing = function() {
+                return $scope.reqObj != null;
+            }
+        })
+
         .constant('cookieParticleAccessToken', 'PARTICLE_PLAY_ACCESS_TOKEN')
+
+        .constant('products', {
+            0: {
+                label: 'Core',
+                image: 'https://cdn.particle.io/images/core-new-b21461f2.png'
+            },
+            6: {
+                label: 'Photon',
+                image: 'https://docs.particle.io/assets/images/photon-new.jpg'
+            }
+        })
     ;
 }());

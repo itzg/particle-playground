@@ -1,0 +1,12 @@
+.corner-info {
+    text-align: right;
+    padding-top: 15px;
+}
+
+.productImage {
+    height: 64px;
+}
+
+div.events > div.row + div.row {
+    margin-top: 10px;
+}

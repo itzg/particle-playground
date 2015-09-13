@@ -7,6 +7,7 @@
                 <thead>
                 <th></th>
                 <th>Name</th>
+                <th>Type</th>
                 <th>Connected?</th>
                 <th>Last Heard</th>
                 </thead>
@@ -15,6 +16,7 @@
                     <td><input type="checkbox" ng-model="device.active"
                                ng-change="handleActiveDeviceChange()"/></td>
                     <td>{{device.name}}</td>
+                    <td><img class="productImage" ng-src="{{getProductInfo(device).image}}"/></td>
                     <td>{{device.connected}}</td>
                     <td>{{device.lastHeard | amCalendar}}</td>
                 </tr>
@@ -27,6 +29,7 @@
 
         <div ng-show="activeDevices.length == 1">
             <h3>Functions</h3>
+
             <div ng-repeat="func in activeDevices[0].functions">
                 {{func}}
             </div>
@@ -41,6 +44,56 @@
                 </div>
                 <button type="submit" class="btn btn-default">Call</button>
             </form>
+        </div>
+    </div>
+
+    <div class="col-md-12 events" ng-controller="SubscribeEventsController">
+        <h2>Subscribe to Events</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="btn-group">
+                    <label class="btn btn-default" ng-model="deviceScope" btn-radio="'all'">Everything</label>
+                    <label class="btn btn-default" ng-model="deviceScope" btn-radio="'mine'">My Devices</label>
+                    <label class="btn btn-default" ng-model="deviceScope" btn-radio="'selected'"
+                           ng-disabled="activeDevices.length != 1">Selected Device</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Event Name or Prefix" ng-model="prefix"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <button class="btn btn-primary" type="button" ng-click="subscribe()" ng-show="!isSubscribing()">Subscribe</button>
+                <button class="btn btn-warning" type="button" ng-click="unsubscribe()" ng-show="isSubscribing()">Stop</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Events</h3>
+                <table class="table">
+                    <thead>
+                        <th>Published</th>
+                        <th>Name</th>
+                        <th>Data</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="e in events">
+                            <td>{{e.published_at | amCalendar}}</td>
+                            <td>{{e.name}}</td>
+                            <td>{{e.data}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
